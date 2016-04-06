@@ -9,5 +9,5 @@ executable mythtvguide
   main: mythtv_guide.ml
   src-dir: src
   c-dir: ./
-  build-deps: lwt, cohttp, cohttp.lwt-core, cohttp.lwt, core, yojson, ppx_deriving, ppx_deriving.std, ppx_deriving_yojson
+  build-deps: lwt, cohttp, cohttp.lwt-core, cohttp.lwt, core, yojson, ppx_deriving_yojson
 
