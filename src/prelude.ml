@@ -1,11 +1,8 @@
 open Core
 open Yojson
 
-let rec generate_time_range (start_time: Core.Time.t) (end_time: Core.Time.t) (step: Core.Span.t) =
-    if start_time >= end_time then
-        [end_time]
-    else 
-        start_time :: (generate_time_range (Core.Time.add start_time step) end_time step)
+let numeric_string_compare (a: string) (b: string) : int =
+    Core.Std.Float.compare (Core.Std.Float.of_string a) (Core.Std.Float.of_string b)
 
 (* Wrapper around Core.Time.t that allows de/serialization with ppx_deriving_yojson *)
 module Time_Yojson_adapter = struct
@@ -30,6 +27,12 @@ end
 
 module TimeUtils = struct 
     module TimeMap = Map.Make (Core.Time)
+
+    let rec generate_time_range (start_time: Core.Time.t) (end_time: Core.Time.t) (step: Core.Span.t) =
+        if start_time >= end_time then
+            [end_time]
+        else 
+            start_time :: (generate_time_range (Core.Time.add start_time step) end_time step)
 
     let group_into_timemap (f: 'a -> Core.Time.t) (l : 'a list) =
         List.fold_left (fun map v ->

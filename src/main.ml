@@ -1,42 +1,41 @@
 open Prelude
 open Core
 
-let group_programs_by_time (g: Libmythtvguide.program_guide) : (Libmythtvguide.channel * Libmythtvguide.program) list Prelude.TimeUtils.TimeMap.t  =
-    g.channels
-    |> List.map (fun chan -> List.map (fun prog -> (chan, prog)) chan.Libmythtvguide.programs)
-    |> List.flatten
-    |> Prelude.TimeUtils.group_into_timemap (fun ((c: Libmythtvguide.channel), (p: Libmythtvguide.program)) -> Prelude.TimeUtils.at_half_hour_floor p.Libmythtvguide.startTime)
-;;
 
-let time_to_hour_and_minute_str (t: Core.Time.t) = 
-    Core.Time.format t "%H:%M" ~zone:Core.Time.Zone.local
+(* Utilities for printing output nicely *)
+module OutputUtils = struct
+    type channel_program_pair = {c: Libmythtvguide.channel; p: Libmythtvguide.program}
 
-let channel_and_program_to_string ((c: Libmythtvguide.channel), (p: Libmythtvguide.program)) : string =
-    Printf.sprintf "(%5s) %8s: %s (at %s)" 
-        c.chanNum
-        c.channelName 
-        p.title 
-        (time_to_hour_and_minute_str p.startTime)
+    let group_programs_by_time (g: Libmythtvguide.program_guide) : channel_program_pair list Prelude.TimeUtils.TimeMap.t  =
+        g.channels
+        |> List.map (fun chan -> List.map (fun prog -> {c = chan; p = prog}) chan.Libmythtvguide.programs)
+        |> List.flatten
+        |> Prelude.TimeUtils.group_into_timemap (fun (cp: channel_program_pair) -> Prelude.TimeUtils.at_half_hour_floor (cp.p.startTime))
+        |> Prelude.TimeUtils.TimeMap.map (List.sort (fun (cp1: channel_program_pair) (cp2: channel_program_pair) -> Prelude.numeric_string_compare cp1.c.chanNum cp2.c.chanNum))
+    ;;
 
-let print_hour_lineup (hour: Core.Time.t) (lineup: (Libmythtvguide.channel * Libmythtvguide.program) list) =
-    let lineup_lines = List.map channel_and_program_to_string lineup in
-    let lines_to_print = List.append [
-        (time_to_hour_and_minute_str hour) ;
-        "--------------------------------------------" ; 
-    ] lineup_lines 
-    in
-    List.iter print_endline lines_to_print ;
-    print_endline ""
+    let time_to_hour_and_minute_str (t: Core.Time.t) = 
+        Core.Time.format t "%H:%M" ~zone:Core.Time.Zone.local
 
-let main (start_time: Core.Time.t) (end_time: Core.Time.t)  =
-    let maybe_guide = Lwt_main.run (Libmythtvguide.get_guide start_time end_time) in
-    match maybe_guide with
-    | `Ok guide     -> 
-        group_programs_by_time guide 
-        |> Prelude.TimeUtils.TimeMap.iter print_hour_lineup
-    | `Error errmsg -> print_endline ("Error: " ^ errmsg)
+    let channel_and_program_to_string (cp: channel_program_pair) : string =
+        Printf.sprintf "(%5s) %8s: %s (at %s)" 
+            cp.c.chanNum
+            cp.c.channelName 
+            cp.p.title 
+            (time_to_hour_and_minute_str cp.p.startTime)
 
-(* CLI stuff *)
+    let print_hour_lineup (hour: Core.Time.t) (lineup: channel_program_pair list) =
+        let lineup_lines = List.map channel_and_program_to_string lineup in
+        let lines_to_print = List.append [
+            (time_to_hour_and_minute_str hour) ;
+            "--------------------------------------------" ; 
+        ] lineup_lines 
+        in
+        List.iter print_endline lines_to_print ;
+        print_endline ""
+end
+
+(* CLI option stuff *)
 module CLI = struct 
     let start_time = ref (Core.Time.now())
     let end_time = ref (Core.Time.add (!start_time) (Core.Time.Span.of_day 1.0))
@@ -46,15 +45,23 @@ module CLI = struct
         start_time := (Core.Time.of_string s) ;
         end_time := (Core.Time.add (!start_time) (Core.Time.Span.of_day 1.0))
 
-    let cli_opts = [
+    let cli_option_specs = [
         ("-s", (Arg.String set_start_time), "Start time in 'YYYY-MM-DD HH:MM:SS' format");
         ("-e", (Arg.String set_end_time), "End time in 'YYYY-MM-DD HH:MM:SS' format");
     ]
 end
 
+let main (start_time: Core.Time.t) (end_time: Core.Time.t)  =
+    let maybe_guide = Lwt_main.run (Libmythtvguide.get_guide start_time end_time) in
+    match maybe_guide with
+    | `Ok guide     -> 
+        OutputUtils.group_programs_by_time guide 
+        |> Prelude.TimeUtils.TimeMap.iter OutputUtils.print_hour_lineup
+    | `Error errmsg -> print_endline ("Error: " ^ errmsg)
+
 let () =
     Arg.parse 
-        CLI.cli_opts 
+        CLI.cli_option_specs 
         (fun x -> 
             print_endline ("Unknown argument '" ^ x ^ "'");
             exit 1

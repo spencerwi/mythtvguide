@@ -4,6 +4,7 @@ synopsis: A console util for spitting out MythTV's program guide
 obuild-ver: 1
 licence: MIT
 authors: Spencer Williams <spencerwi@gmail.com>
+ocaml-extra-args: -w -40
 
 executable mythtvguide
   main: main.ml

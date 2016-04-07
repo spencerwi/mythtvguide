@@ -1,4 +1,5 @@
-val generate_time_range : Core.Time.t -> Core.Time.t -> Core.Span.t -> Core.Time.t list
+
+val numeric_string_compare : string -> string -> int
 
 (* Wrapper around Core.Time.t that allows de/serialization with ppx_deriving_yojson *)
 module Time_Yojson_adapter : sig
@@ -16,6 +17,7 @@ module TimeUtils : sig
             and type 'a t = 'a Map.Make(Core.Time).t
         )
     end
+    val generate_time_range : Core.Time.t -> Core.Time.t -> Core.Span.t -> Core.Time.t list
     val group_into_timemap : ('a -> Core.Time.t) -> 'a list -> 'a list TimeMap.t
     val at_midnight : ?zone:Core.Time.Zone.t -> Core.Time.t -> Core.Time.t
     val at_start_of_hour : ?zone:Core.Time.Zone.t -> Core.Time.t -> Core.Time.t

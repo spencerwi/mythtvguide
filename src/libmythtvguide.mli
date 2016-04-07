@@ -59,4 +59,4 @@ type guide_response = {
 val guide_response_of_yojson : Yojson.Safe.json -> [`Error of string | `Ok of guide_response]
 val guide_response_to_yojson : guide_response -> Yojson.Safe.json 
 
-val get_guide : Core.Time.t -> Core.Time.t -> [`Error of string | `Ok of program_guide ] Lwt.t 
+val get_guide : ?channel_filter:(string option) -> Core.Time.t -> Core.Time.t -> [`Error of string | `Ok of program_guide ] Lwt.t 
