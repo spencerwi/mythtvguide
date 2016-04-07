@@ -65,7 +65,23 @@ let apply_channel_filter (channel_filter: string option) (guide: program_guide) 
     in
         {guide with channels = (List.filter filter_function guide.channels)}
 
-let get_guide ?channel_filter:(channel_filter=None) (start_time: Core.Time.t) (end_time: Core.Time.t) :  [`Error of string | `Ok of program_guide ] Lwt.t  =
+let apply_program_name_filter (program_name_filter: string option) (guide: program_guide) =
+    let program_filter = 
+        match program_name_filter with
+        | None -> (fun _ -> true)
+        | Some s -> (fun prog -> Core.Std.String.is_substring prog.title ~substring:s)
+    in
+    let filter_channel (c: channel) = 
+        {c with programs = (List.filter program_filter c.programs)}
+    in
+    let filtered_channels =
+        guide.channels
+        |> List.map filter_channel
+        |> List.filter (fun (c: channel) -> (Core.Std.List.is_empty c.programs) = false)
+    in
+        {guide with channels = filtered_channels}
+
+let get_guide ?channel_filter:(channel_filter=None) ?program_name_filter:(program_name_filter=None) (start_time: Core.Time.t) (end_time: Core.Time.t) :  [`Error of string | `Ok of program_guide ] Lwt.t  =
     let zone = Core.Time.Zone.utc in (* Don't adjust the time zone again *)
     let (start_str, end_str) = (
         Core.Time.format start_time "%Y-%m-%dT%H:%M:%S" ~zone,
@@ -81,5 +97,5 @@ let get_guide ?channel_filter:(channel_filter=None) (start_time: Core.Time.t) (e
             |> Yojson.Safe.from_string 
             |> guide_response_of_yojson
             |> (function | `Error err -> `Error err
-                         | `Ok r -> `Ok (apply_channel_filter channel_filter r.guide))
+                         | `Ok r -> `Ok (r.guide |> (apply_channel_filter channel_filter) |> (apply_program_name_filter program_name_filter)))
 

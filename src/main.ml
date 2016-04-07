@@ -39,27 +39,42 @@ end
 module CLI = struct 
     let start_time = ref (Core.Time.now())
     let end_time = ref (Core.Time.add (!start_time) (Core.Time.Span.of_day 1.0))
-    let channel_filter = ref (None)
+    let channel_name_filter = ref (None)
+    let program_name_filter = ref (None)
 
     let set_end_time (s: string)   = end_time := (Core.Time.of_string s)
     let set_start_time (s: string) = 
         start_time := (Core.Time.of_string s) ;
         end_time := (Core.Time.add (!start_time) (Core.Time.Span.of_day 1.0))
-    let set_channel_filter (s: string) =
+    let set_channel_name_filter (s: string) =
         if (String.length s) > 0 then
-            channel_filter := (Some s)
+            channel_name_filter := (Some s)
         else
-            channel_filter := None
+            channel_name_filter := None
+
+    let set_program_name_filter (s: string) =
+        if (String.length s) > 0 then
+            program_name_filter := (Some s)
+        else
+            program_name_filter := None
 
     let cli_option_specs = [
         ("-s", (Arg.String set_start_time), "Start time in 'YYYY-MM-DD HH:MM:SS' format");
         ("-e", (Arg.String set_end_time), "End time in 'YYYY-MM-DD HH:MM:SS' format");
-        ("-channelname", (Arg.String set_channel_filter), "Channel name filter");
+        ("-channelname", (Arg.String set_channel_name_filter), "Channel name filter");
+        ("-programname", (Arg.String set_program_name_filter), "Program name filter");
     ]
 end
 
-let main (start_time: Core.Time.t) (end_time: Core.Time.t) (channel_name_filter: string option) =
-    let maybe_guide = Lwt_main.run (Libmythtvguide.get_guide ~channel_filter:channel_name_filter start_time end_time) in
+let main (start_time: Core.Time.t) (end_time: Core.Time.t) (channel_name_filter: string option) (program_name_filter: string option) =
+    let maybe_guide = Lwt_main.run (
+        Libmythtvguide.get_guide 
+            ~channel_filter:channel_name_filter 
+            ~program_name_filter:program_name_filter
+            start_time 
+            end_time
+    ) 
+    in
     match maybe_guide with
     | `Ok guide     -> 
         OutputUtils.group_programs_by_time guide 
@@ -74,4 +89,4 @@ let () =
             exit 1
         )
         "usage: mythtvguide [-s start_time] [-e end_time]" ;
-    main (!CLI.start_time) (!CLI.end_time) (!CLI.channel_filter)
+    main (!CLI.start_time) (!CLI.end_time) (!CLI.channel_name_filter) (!CLI.program_name_filter)
