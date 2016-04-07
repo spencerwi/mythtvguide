@@ -57,10 +57,11 @@ type guide_response = {
     guide: program_guide [@key "ProgramGuide"];
 } [@@deriving yojson { strict = false }];;
 
-let get_guide (start_date: Core.Time.t) (end_date: Core.Time.t) :  [`Error of string | `Ok of program_guide ] Lwt.t  =
+let get_guide (start_time: Core.Time.t) (end_time: Core.Time.t) :  [`Error of string | `Ok of program_guide ] Lwt.t  =
+    let zone = Core.Time.Zone.utc in (* Don't adjust the time zone again *)
     let (start_str, end_str) = (
-        Core.Time.format start_date "%Y-%m-%d'T'%H:%M:%S" ~zone:Core.Time.Zone.local,
-        Core.Time.format end_date "%Y-%m-%d'T'%H:%M:%S" ~zone:Core.Time.Zone.local
+        Core.Time.format start_time "%Y-%m-%dT%H:%M:%S" ~zone,
+        Core.Time.format end_time "%Y-%m-%dT%H:%M:%S" ~zone
     ) in
     let guide_url = Uri.of_string ("http://localhost:6544/Guide/GetProgramGuide?StartTime=" ^ start_str  ^ "&EndTime=" ^ end_str) in
     let headers = Cohttp.Header.of_list [("Accept", "application/json")] 

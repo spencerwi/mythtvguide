@@ -19,6 +19,7 @@ module TimeUtils : sig
     val group_into_timemap : ('a -> Core.Time.t) -> 'a list -> 'a list TimeMap.t
     val at_midnight : ?zone:Core.Time.Zone.t -> Core.Time.t -> Core.Time.t
     val at_start_of_hour : ?zone:Core.Time.Zone.t -> Core.Time.t -> Core.Time.t
+    val at_half_hour_floor : ?zone:Core.Time.Zone.t -> Core.Time.t -> Core.Time.t
 end
 
     

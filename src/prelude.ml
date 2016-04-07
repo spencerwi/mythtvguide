@@ -52,6 +52,16 @@ module TimeUtils = struct
         in
         let start_of_hour = Core.Time.Ofday.create ~hr:hour () in
         Core.Time.of_date_ofday ~zone:z date start_of_hour
+
+    let at_half_hour_floor ?zone:(z=Core.Time.Zone.local) (datetime: Core.Time.t) : Core.Time.t =
+        let (date, time) = Core.Time.to_date_ofday datetime ~zone:z in
+        let (hour, minute) = 
+            (Core.Time.Ofday.to_parts time)
+            |> (fun parts -> (parts.hr, parts.min))
+        in
+        let new_min = if (minute < 30) then 0 else 30 in
+        let half_hour_floor = Core.Time.Ofday.create ~hr:hour ~min:new_min () in
+        Core.Time.of_date_ofday ~zone:z date half_hour_floor
 end
 
     
