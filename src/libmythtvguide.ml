@@ -57,6 +57,14 @@ type guide_response = {
     guide: program_guide [@key "ProgramGuide"];
 } [@@deriving yojson { strict = false }];;
 
+let apply_channel_filter (channel_filter: string option) (guide: program_guide) =
+    let filter_function = 
+        match channel_filter with
+        | None -> (fun _ -> true)
+        | Some s -> (fun chan -> Core.Std.String.is_substring chan.channelName ~substring:s)
+    in
+        {guide with channels = (List.filter filter_function guide.channels)}
+
 let get_guide ?channel_filter:(channel_filter=None) (start_time: Core.Time.t) (end_time: Core.Time.t) :  [`Error of string | `Ok of program_guide ] Lwt.t  =
     let zone = Core.Time.Zone.utc in (* Don't adjust the time zone again *)
     let (start_str, end_str) = (
@@ -73,5 +81,5 @@ let get_guide ?channel_filter:(channel_filter=None) (start_time: Core.Time.t) (e
             |> Yojson.Safe.from_string 
             |> guide_response_of_yojson
             |> (function | `Error err -> `Error err
-                         | `Ok r -> `Ok r.guide)
+                         | `Ok r -> `Ok (apply_channel_filter channel_filter r.guide))
 
