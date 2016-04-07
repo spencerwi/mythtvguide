@@ -3,29 +3,8 @@ open Cohttp
 open Cohttp_lwt
 open Cohttp_lwt_unix
 open Core
+open Prelude
 
-(*
-#require "core";;
-#require "yojson";;
-*)
-module Date_Yojson_adapter = struct
-    type t = Core.Time.t
-    let of_yojson (json: Yojson.Safe.json) = 
-        try 
-            json 
-            |> Yojson.Safe.to_string 
-            |> (fun s -> Core.Std.String.lstrip ~drop:(function | '\\' -> true | '"' -> true | _ -> false) s)
-            |> (fun s -> Core.Std.String.rstrip ~drop:(function | '\\' -> true | '"' -> true | _ -> false) s)
-            |> Core.Time.of_string
-            |> (fun t -> `Ok t)
-        with
-            _ -> `Error "Failed Parsing Date"
-    let to_yojson (t: t) : Yojson.Safe.json = 
-        t 
-        |> (fun s -> Core.Time.format s "%Y-%m-%dT%H:%M:%SZ" ~zone:Core.Time.Zone.local)
-        |> (fun s -> "\"" ^ s ^ "\"")
-        |> Yojson.Safe.from_string
-end
 
 type program_recording_preferences = {
     status: string [@key "Status"] [@default ""];
@@ -43,8 +22,8 @@ type program_recording_preferences = {
 } [@@deriving yojson { strict = false }];;
 
 type program = {
-    startTime: Date_Yojson_adapter.t [@key "StartTime"];
-    endTime: Date_Yojson_adapter.t [@key "EndTime"];
+    startTime: Time_Yojson_adapter.t [@key "StartTime"];
+    endTime: Time_Yojson_adapter.t [@key "EndTime"];
     title: string [@key "Title"];
     subtitle: string [@key "SubTitle"];
     category: string [@key "Category"];
@@ -66,8 +45,8 @@ type program_guide = {
     asOf: string [@key "AsOf"];
     count: string [@key "Count"];
     details: string [@key "Details"];
-    startTime: Date_Yojson_adapter.t [@key "StartTime"];
-    endTime: Date_Yojson_adapter.t [@key "EndTime"];
+    startTime: Time_Yojson_adapter.t [@key "StartTime"];
+    endTime: Time_Yojson_adapter.t [@key "EndTime"];
     startChanId: string [@key "StartChanId"];
     endChanId: string [@key "EndChanId"];
     numOfChannels: string [@key "NumOfChannels"];
