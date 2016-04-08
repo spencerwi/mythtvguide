@@ -79,7 +79,9 @@ let main (start_time: Core.Time.t) (end_time: Core.Time.t) (channel_name_filter:
     | `Ok guide     -> 
         OutputUtils.group_programs_by_time guide 
         |> Prelude.TimeUtils.TimeMap.iter OutputUtils.print_hour_lineup
-    | `Error errmsg -> print_endline ("Error: " ^ errmsg)
+    | `Error errmsg -> 
+            print_endline ("Error: " ^ errmsg);
+            exit 1
 
 let () =
     Arg.parse 
