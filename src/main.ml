@@ -90,5 +90,5 @@ let () =
             print_endline ("Unknown argument '" ^ x ^ "'");
             exit 1
         )
-        "usage: mythtvguide [-s start_time] [-e end_time]" ;
+        "usage: mythtvguide [options]" ;
     main (!CLI.start_time) (!CLI.end_time) (!CLI.channel_name_filter) (!CLI.program_name_filter)
