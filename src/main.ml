@@ -15,7 +15,7 @@ module OutputUtils = struct
     ;;
 
     let time_to_hour_and_minute_str (t: Core.Time.t) = 
-        Core.Time.format t "%H:%M" ~zone:Core.Time.Zone.local
+        Core.Time.format t "%I:%M%p %a, %b %d" ~zone:Core.Time.Zone.local
 
     let channel_and_program_to_string (cp: channel_program_pair) : string =
         Printf.sprintf "(%5s) %8s: %s (at %s)" 

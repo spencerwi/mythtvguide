@@ -82,7 +82,7 @@ let apply_program_name_filter (program_name_filter: string option) (guide: progr
         {guide with channels = filtered_channels}
 
 let get_guide ?channel_filter:(channel_filter=None) ?program_name_filter:(program_name_filter=None) (start_time: Core.Time.t) (end_time: Core.Time.t) :  [`Error of string | `Ok of program_guide ] Lwt.t  =
-    let zone = Core.Time.Zone.utc in (* Don't adjust the time zone again *)
+    let zone = Core.Time.Zone.local in (* Don't adjust the time zone again *)
     let (start_str, end_str) = (
         Core.Time.format start_time "%Y-%m-%dT%H:%M:%S" ~zone,
         Core.Time.format end_time "%Y-%m-%dT%H:%M:%S" ~zone
