@@ -4,7 +4,7 @@ val numeric_string_compare : string -> string -> int
 (* Wrapper around Core.Time.t that allows de/serialization with ppx_deriving_yojson *)
 module Time_Yojson_adapter : sig
     type t = Core.Time.t
-    val of_yojson : Yojson.Safe.json -> [`Error of string | `Ok of t]
+    val of_yojson : Yojson.Safe.json -> (Core.Time.t, string) result
     val to_yojson : t -> Yojson.Safe.json 
 end
 

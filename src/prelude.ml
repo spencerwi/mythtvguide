@@ -14,9 +14,9 @@ module Time_Yojson_adapter = struct
             |> (fun s -> Core.Std.String.lstrip ~drop:(function | '\\' -> true | '"' -> true | _ -> false) s)
             |> (fun s -> Core.Std.String.rstrip ~drop:(function | '\\' -> true | '"' -> true | _ -> false) s)
             |> Core.Time.of_string
-            |> (fun t -> `Ok t)
+            |> (fun t -> Ok t)
         with
-            _ -> `Error "Failed Parsing Date"
+            _ -> Error "Failed Parsing Date"
     let to_yojson (t: t) : Yojson.Safe.json = 
         t 
         |> (fun s -> Core.Time.format s "%Y-%m-%dT%H:%M:%SZ" ~zone:Core.Time.Zone.local)

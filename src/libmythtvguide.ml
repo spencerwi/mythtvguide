@@ -47,9 +47,6 @@ type program_guide = {
     details: string [@key "Details"];
     startTime: Time_Yojson_adapter.t [@key "StartTime"];
     endTime: Time_Yojson_adapter.t [@key "EndTime"];
-    startChanId: string [@key "StartChanId"];
-    endChanId: string [@key "EndChanId"];
-    numOfChannels: string [@key "NumOfChannels"];
     channels: channel list [@key "Channels"];
 } [@@deriving yojson { strict = false }];;
 
@@ -96,6 +93,6 @@ let get_guide ?channel_filter:(channel_filter=None) ?program_name_filter:(progra
             |> (Core.Std.String.filter ~f:Core.Std.Char.is_print) 
             |> Yojson.Safe.from_string 
             |> guide_response_of_yojson
-            |> (function | `Error err -> `Error err
-                         | `Ok r -> `Ok (r.guide |> (apply_channel_filter channel_filter) |> (apply_program_name_filter program_name_filter)))
+            |> (function | Error err -> `Error err
+                         | Ok r -> `Ok (r.guide |> (apply_channel_filter channel_filter) |> (apply_program_name_filter program_name_filter)))
 
