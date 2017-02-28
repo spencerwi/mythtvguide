@@ -1,5 +1,5 @@
 name: mythtvguide
-version: 0.1.0
+version: 0.1.1
 synopsis: A console util for spitting out MythTV's program guide
 obuild-ver: 1
 licence: MIT
@@ -10,5 +10,5 @@ executable mythtvguide
   main: main.ml
   src-dir: src
   c-dir: ./
-  build-deps: lwt, cohttp, cohttp.lwt-core, cohttp.lwt, core, yojson, ppx_deriving_yojson
+  build-deps: lwt, cohttp, cohttp.lwt-core, cohttp.lwt, core, yojson, ppx_deriving_yojson, lwt.ppx
 

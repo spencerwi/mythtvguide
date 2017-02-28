@@ -1,1 +1,1 @@
-true: package(core), package(cohttp), package(lwt)
+true: package(core), package(cohttp), package(lwt), package(lwt.pxx)

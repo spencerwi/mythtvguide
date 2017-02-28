@@ -1,5 +1,5 @@
 S src
 B dist/build/mythtvguide
 B dist/build/autogen
-PKG lwt cohttp cohttp.lwt-core cohttp.lwt core yojson ppx_deriving_yojson
+PKG lwt cohttp cohttp.lwt-core cohttp.lwt core yojson ppx_deriving_yojson lwt.ppx
 

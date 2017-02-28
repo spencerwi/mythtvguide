@@ -87,7 +87,7 @@ let get_guide ?channel_filter:(channel_filter=None) ?program_name_filter:(progra
     let guide_url = Uri.of_string ("http://localhost:6544/Guide/GetProgramGuide?StartTime=" ^ start_str  ^ "&EndTime=" ^ end_str) in
     let headers = Cohttp.Header.of_list [("Accept", "application/json")] 
     in
-    Client.get ~headers:headers guide_url >>= fun (response, responseBody) -> 
+    let%lwt (response, responseBody) = Client.get ~headers:headers guide_url in
         responseBody |> Cohttp_lwt_body.to_string >|= fun stringBody -> 
             stringBody 
             |> (Core.Std.String.filter ~f:Core.Std.Char.is_print) 
