@@ -1,0 +1,28 @@
+opam-version: "1.2"
+name: "mythtvguide"
+maintainer: "spencer.williams@gmail.com"
+authors: ["Spencer Williams"]
+homepage: "https://github.com/spencerwi/mythtvguide"
+dev-repo: "git+https://github.com/spencerwi/mythtvguide.git"
+bug-reports: "https://github.com/spencerwi/myhttvguide/issues"
+license: "MIT"
+
+build: [
+  "dune" "build" "-p" name "-j" jobs
+]
+
+depends: [
+  "dune" {build}
+  "lwt"  {build}
+  "cohttp" {build}
+  "cohttp-lwt" {build}
+  "cohttp-lwt-unix" {build}
+  "core" {build}
+  "yojson" {build}
+  "ppx_deriving_yojson" {build}
+  "lwt_ppx" {build}
+]
+
+available: [
+  ocaml-version >= "4.06.0"
+]

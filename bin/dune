@@ -1,0 +1,5 @@
+(executable
+    (name mythtvguide)
+    (libraries libmythtvguide ppx_deriving_yojson.runtime)
+    (flags (:standard -w -39)))
+

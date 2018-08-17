@@ -1,7 +1,3 @@
-open Prelude
-open Core
-
-
 (* Utilities for printing output nicely *)
 module OutputUtils = struct
     type channel_program_pair = {c: Libmythtvguide.channel; p: Libmythtvguide.program}
@@ -15,7 +11,7 @@ module OutputUtils = struct
     ;;
 
     let time_to_hour_and_minute_str (t: Core.Time.t) = 
-        Core.Time.format t "%I:%M%p %a, %b %d" ~zone:Core.Time.Zone.local
+        Core.Time.format t "%I:%M%p %a, %b %d" ~zone:(Core.Lazy.force Core.Time.Zone.local)
 
     let channel_and_program_to_string (cp: channel_program_pair) : string =
         Printf.sprintf "(%5s) %8s: %s (at %s)" 
@@ -41,6 +37,7 @@ module CLI = struct
     let end_time = ref (Core.Time.add (!start_time) (Core.Time.Span.of_day 1.0))
     let channel_name_filter = ref (None)
     let program_name_filter = ref (None)
+    let host = ref "127.0.0.1"
 
     let set_end_time (s: string)   = end_time := (Core.Time.of_string s)
     let set_start_time (s: string) = 
@@ -58,19 +55,25 @@ module CLI = struct
         else
             program_name_filter := None
 
+    let set_host (s: string) =
+        if (String.length s) > 0 then
+            host := s
+
     let cli_option_specs = [
         ("-s", (Arg.String set_start_time), "Start time in 'YYYY-MM-DD HH:MM:SS' format");
         ("-e", (Arg.String set_end_time), "End time in 'YYYY-MM-DD HH:MM:SS' format");
         ("-channelname", (Arg.String set_channel_name_filter), "Channel name filter");
         ("-programname", (Arg.String set_program_name_filter), "Program name filter");
+        ("-host", (Arg.String set_host), "Host where mythtv backend is running")
     ]
 end
 
-let main (start_time: Core.Time.t) (end_time: Core.Time.t) (channel_name_filter: string option) (program_name_filter: string option) =
+let main (start_time: Core.Time.t) (end_time: Core.Time.t) (channel_name_filter: string option) (program_name_filter: string option) (host: string) =
     let maybe_guide = Lwt_main.run (
         Libmythtvguide.get_guide 
             ~channel_filter:channel_name_filter 
             ~program_name_filter:program_name_filter
+            ~host:host
             start_time 
             end_time
     ) 
@@ -91,4 +94,4 @@ let () =
             exit 1
         )
         "usage: mythtvguide [options]" ;
-    main (!CLI.start_time) (!CLI.end_time) (!CLI.channel_name_filter) (!CLI.program_name_filter)
+    main (!CLI.start_time) (!CLI.end_time) (!CLI.channel_name_filter) (!CLI.program_name_filter) (!CLI.host)
