@@ -1,12 +1,11 @@
 all: clean
-	obuild configure
-	obuild build
+	dune build bin/mythtvguide.exe
 
 run: all
-	./mythtvguide
+	dune exec bin/mythtvguide.exe
 
 clean:
-	obuild clean
+	dune clean
 
 install:
-	obuild install
+	dune install
