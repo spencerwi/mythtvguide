@@ -3,6 +3,6 @@ lib: [
   "_build/install/default/lib/mythtvguide/opam" {"opam"}
 ]
 doc: [
-  "_build/install/default/doc/mythtvguide/README.md"
   "_build/install/default/doc/mythtvguide/LICENSE"
+  "_build/install/default/doc/mythtvguide/README.md"
 ]

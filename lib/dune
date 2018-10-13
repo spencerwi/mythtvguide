@@ -1,7 +1,7 @@
 (library 
     (name libmythtvguide)
     (wrapped false)
-    (libraries Core lwt lwt_ppx cohttp cohttp.lwt core yojson ppx_deriving_yojson ppx_deriving_yojson.runtime)
-    (preprocess (pps ppx_deriving_yojson lwt.ppx))
+    (libraries core lwt lwt_ppx cohttp cohttp.lwt yojson ppx_deriving_yojson ppx_deriving_yojson.runtime)
+    (preprocess (pps ppx_deriving_yojson lwt_ppx))
     (ppx_runtime_libraries ppx_deriving_yojson.runtime)
     (flags (:standard -w -39)))
